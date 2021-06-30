@@ -1,0 +1,36 @@
+.authentication__header {
+  color: white;
+  text-align: center;
+}
+
+.authentication {
+  width: 90%;
+  max-width: 25rem;
+  margin: 3rem auto;
+  text-align: center;
+}
+
+.authentication form {
+  margin-bottom: 1rem;
+}
+
+.authentication__signup {
+  max-width: 50rem;
+}
+
+.authentication__imageUpload {
+  grid-column: 1 / span 2;
+}
+
+.form__signup {
+  display: grid;
+  grid-template-columns: 50% 50%;
+  gap: 0 3rem;
+  margin: 1rem 3rem;
+  width: 80%;
+}
+
+.form__signup button {
+  grid-column: 1 / span 2;
+  margin: 0 10%;
+}
