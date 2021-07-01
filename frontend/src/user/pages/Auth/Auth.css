@@ -34,3 +34,8 @@
   grid-column: 1 / span 2;
   margin: 0 10%;
 }
+
+.authentication__socialLogin_button button{
+  display: block;
+  margin: 20px auto;
+}

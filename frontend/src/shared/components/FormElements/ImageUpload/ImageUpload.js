@@ -41,7 +41,7 @@ const ImageUpload = (props) => {
   };
 
   return (
-    <div className={`form-control ${props.className}`}>
+    <div className={`form-control ${props.className || ''}`}>
       <input
         id={props.id}
         ref={filePickerRef}

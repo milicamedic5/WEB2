@@ -13,6 +13,12 @@ const formReducer = (state, action) => {
         } else {
           formIsValid = formIsValid && state.inputs[inputId].isValid;
         }
+        if (state.inputs["confirmPassword"] && action.inputId === "password") {
+          formIsValid = formIsValid && action.value === state.inputs["confirmPassword"].value
+        }
+        if (state.inputs["confirmPassword"] && action.inputId === "confirmPassword") {
+          formIsValid = formIsValid && action.value === state.inputs["password"].value
+        }
       }
       return {
         ...state,
