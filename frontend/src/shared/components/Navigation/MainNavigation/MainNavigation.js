@@ -32,6 +32,7 @@ const MainNavigation = () => {
           <span />
           <span />
         </button>
+        <h3 className="main-navigation__user">Milica Medic</h3>
         <nav className="main-navigation__header-nav">
           <NavLinks />
         </nav>

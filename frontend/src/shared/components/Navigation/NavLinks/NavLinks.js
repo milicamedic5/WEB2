@@ -9,17 +9,20 @@ const NavLinks = () => {
 
   return (
     <ul className="nav-links">
-      {auth.isLoggedIn && (
+      {!auth.isLoggedIn && (
       <li>
-        <NavLink to="/" exact>
-          WORK PLANS
-        </NavLink>
+        <NavLink to="/1/workrequests" exact>WORK REQUESTS</NavLink>
       </li>
       )}
-      {auth.isLoggedIn && (
+      {!auth.isLoggedIn && (
         <li>
-          <NavLink to={`/${auth.userId}/profile`}>MY PROFILE</NavLink>
+          <NavLink to="/teams">TEAMS</NavLink>
         </li>
+      )}
+      {!auth.isLoggedIn && (
+      <li>
+        <NavLink to="/map" exact>MAP</NavLink>
+      </li>
       )}
       {!auth.isLoggedIn && (
         <li>

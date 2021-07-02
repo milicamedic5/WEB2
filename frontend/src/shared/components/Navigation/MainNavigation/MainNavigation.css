@@ -17,12 +17,7 @@
   background: white;
 }
 
-.main-navigation__title {
-  color: white;
-}
-
-.main-navigation__title a {
-  text-decoration: none;
+.main-navigation__user {
   color: white;
 }
 
@@ -41,5 +36,6 @@
 
   .main-navigation__header-nav {
     display: block;
+    margin: 0 0 0 auto;
   }
 }

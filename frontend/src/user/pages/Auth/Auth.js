@@ -79,7 +79,6 @@ const Auth = () => {
         false
       );
     }
-
     setIsLoginMode(prevState => !prevState);
   };
 
@@ -96,7 +95,8 @@ const Auth = () => {
     event.preventDefault();
 
     console.log(formState.inputs);
-    console.log('send it to backend!')
+    console.log('send it to backend!');
+    console.log('approved or not?');
   };
 
   const responseGoogleSuccess = (response) => {
