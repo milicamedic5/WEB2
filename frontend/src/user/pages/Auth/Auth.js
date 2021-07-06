@@ -1,14 +1,17 @@
-import React, { useEffect, useState } from "react";
-import GoogleLogin from 'react-google-login';
+import React, { useEffect, useState, useContext } from "react";
+import { AuthContext } from "../../../shared/context/auth-context";
+import GoogleLogin from "react-google-login";
 import Button from "../../../shared/components/FormElements/Button/Button";
 import Input from "../../../shared/components/FormElements/Input/Input";
 import Card from "../../../shared/components/UIElements/Card/Card";
+import ErrorModal from "../../../shared/components/UIElements/ErrorModal/ErrorModal";
 import {
   VALIDATOR_EMAIL,
   VALIDATOR_MINLENGTH,
   VALIDATOR_REQUIRE,
 } from "../../../shared/util/validators";
 import { useForm } from "../../../shared/hooks/form-hook";
+import { useHttpClient } from "../../../shared/hooks/http-hook";
 
 import "./Auth.css";
 import ImageUpload from "../../../shared/components/FormElements/ImageUpload/ImageUpload";
@@ -16,6 +19,8 @@ import ImageUpload from "../../../shared/components/FormElements/ImageUpload/Ima
 const Auth = () => {
   const [isLoginMode, setIsLoginMode] = useState(true);
   const [isTeamMemberRole, setIsTeamMemberRole] = useState(false);
+  const { isLoading, error, sendRequest, clearError } = useHttpClient();
+  const auth = useContext(AuthContext);
   const [formState, inputHandler, setFormData] = useForm(
     {
       email: {
@@ -36,6 +41,12 @@ const Auth = () => {
         {
           ...formState.inputs,
           name: undefined,
+          lastname: undefined,
+          username: undefined,
+          birthday: undefined,
+          role: undefined,
+          address: undefined,
+          confirmPassword: undefined,
         },
         formState.inputs.email.isValid && formState.inputs.password.isValid
       );
@@ -49,7 +60,7 @@ const Auth = () => {
           },
           image: {
             value: null,
-            isValid: false
+            isValid: false,
           },
           lastname: {
             value: "",
@@ -79,41 +90,90 @@ const Auth = () => {
         false
       );
     }
-    setIsLoginMode(prevState => !prevState);
+    setIsLoginMode((prevState) => !prevState);
   };
 
   useEffect(() => {
     if (formState.inputs.role) {
       console.log(formState.inputs.role);
-      setIsTeamMemberRole(prevState => {
+      setIsTeamMemberRole((prevState) => {
         return formState.inputs.role.value === "Clan ekipe" ? true : false;
       });
     }
-  }, [formState.inputs.role ? formState.inputs.role.value : null, formState.inputs.role]);
+  }, [
+    formState.inputs.role ? formState.inputs.role.value : null,
+    formState.inputs.role,
+  ]);
 
   const authSubmitHandler = async (event) => {
     event.preventDefault();
-
+    if (isLoginMode) {
+      try {
+        const responseData = await sendRequest(
+          "http://localhost:5000/api/auth/login",
+          "POST",
+          JSON.stringify({
+            email: formState.inputs.email.value,
+            password: formState.inputs.password.value,
+          }),
+          {
+            "Content-Type": "application/json",
+          }
+        );
+        console.log(responseData);
+        auth.login(responseData.userId, responseData.token, responseData.role);
+      } catch (error) {
+        console.log(error);
+      }
+    } else {
+      const formData = new FormData();
+      formData.append("Email", formState.inputs.email.value);
+      formData.append("FirstName", formState.inputs.name.value);
+      formData.append("LastName", formState.inputs.lastname.value);
+      formData.append("Birthday", formState.inputs.birthday.value);
+      formData.append("Password", formState.inputs.password.value);
+      formData.append(
+        "ConfirmPassword",
+        formState.inputs.confirmPassword.value
+      );
+      formData.append("Role", formState.inputs.role.value);
+      formData.append("Address", formState.inputs.address.value);
+      //formData.append('image', formState.inputs.image.value);
+      try {
+        const responseData = await sendRequest(
+          "http://localhost:5000/api/auth/signup",
+          "POST",
+          formData
+        );
+      } catch (err) {}
+    }
     console.log(formState.inputs);
-    console.log('send it to backend!');
-    console.log('approved or not?');
+    console.log("approved or not?");
   };
 
   const responseGoogleSuccess = (response) => {
     console.log(response);
-  }
+  };
 
   const responseGoogleFailure = (response) => {
     console.log(response);
-  }
+  };
 
   return (
     <React.Fragment>
-      <Card className={`authentication ${isLoginMode ? '' : 'authentication__signup'}`}>
+      <ErrorModal error={error} onClear={clearError} />
+      <Card
+        className={`authentication ${
+          isLoginMode ? "" : "authentication__signup"
+        }`}
+      >
         {isLoginMode && <h2>Login Required</h2>}
         {!isLoginMode && <h2>Register Account</h2>}
         <hr />
-        <form className={!isLoginMode && 'form__signup'} onSubmit={authSubmitHandler}>
+        <form
+          className={!isLoginMode && "form__signup"}
+          onSubmit={authSubmitHandler}
+        >
           {!isLoginMode && (
             <Input
               id="name"
@@ -208,7 +268,11 @@ const Auth = () => {
               errorText="Please pick a role."
               initialValue="Dispecer"
               initialValid={true}
-              selectOptions={[{value: "Dispecer"}, {value: "Clan ekipe"}, {value: "Radnik"}]}
+              selectOptions={[
+                { value: "Dispecer" },
+                { value: "Clan ekipe" },
+                { value: "Radnik" },
+              ]}
             />
           )}
           {!isLoginMode && isTeamMemberRole && (
@@ -219,7 +283,11 @@ const Auth = () => {
               onInput={inputHandler}
               validators={[VALIDATOR_REQUIRE()]}
               errorText="Please pick a team."
-              selectOptions={[{value: "Team1"}, {value: "Team2"}, {value: "Team3"}]}
+              selectOptions={[
+                { value: "Team1" },
+                { value: "Team2" },
+                { value: "Team3" },
+              ]}
             />
           )}
           {!isLoginMode && (
@@ -236,14 +304,17 @@ const Auth = () => {
             {!isLoginMode && "SIGNUP"}
           </Button>
         </form>
-        {isLoginMode && 
-        (<div className="authentication__socialLogin_button"><GoogleLogin
-          clientId="20750505971-rm4o3m5qtk5ra0g325v64pch5hug1qsl.apps.googleusercontent.com"
-          buttonText="Continue with Google"
-          onSuccess={responseGoogleSuccess}
-          onFailure={responseGoogleFailure}
-          cookiePolicy={'single_host_origin'}
-        /></div>)}
+        {isLoginMode && (
+          <div className="authentication__socialLogin_button">
+            <GoogleLogin
+              clientId="20750505971-rm4o3m5qtk5ra0g325v64pch5hug1qsl.apps.googleusercontent.com"
+              buttonText="Continue with Google"
+              onSuccess={responseGoogleSuccess}
+              onFailure={responseGoogleFailure}
+              cookiePolicy={"single_host_origin"}
+            />
+          </div>
+        )}
         <Button inverse onClick={switchModeHandler}>
           {isLoginMode && "Don't have an account? Register here."}
           {!isLoginMode && "Already have an account? Log in here."}

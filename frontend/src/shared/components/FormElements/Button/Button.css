@@ -59,3 +59,32 @@
 .button--big {
   font-size: 1.5rem;
 }
+
+.button--right {
+  display: block;
+  margin: 0 2rem 0 auto;
+}
+
+.button--add {
+  color: white;
+  background: green;
+  border: green;
+}
+
+.button--add:hover,
+.button--add:active {
+  background: rgb(79, 156, 79);
+  border-color: rgb(79, 156, 79);
+}
+
+.button--edit {
+  color: white;
+  background: orange;
+  border: orange;
+}
+
+.button--edit:hover,
+.button--edit:active {
+  background: rgb(255, 196, 88);
+  border-color: rgb(255, 196, 88);
+}

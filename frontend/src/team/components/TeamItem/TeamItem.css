@@ -1,0 +1,30 @@
+.user-item {
+  margin: 1rem;
+  width: 80%;
+  min-width: 17.5rem;
+  margin: 2rem;
+  display: grid;
+  grid-template-columns: auto auto;
+  position: relative;
+}
+
+p {
+  margin: 0;
+}
+
+.user-item__name {
+}
+
+.user-item__members {
+}
+
+.user-item__member {
+}
+
+.user-item__buttons {
+  position: absolute;
+  top: 0;
+  right: 0;
+  display: grid;
+  gap: 1rem;
+}

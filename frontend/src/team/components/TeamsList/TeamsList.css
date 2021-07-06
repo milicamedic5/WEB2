@@ -1,0 +1,10 @@
+.teams-list__content {
+  margin: 2rem;
+  text-align: center;
+}
+.teams-list {
+  list-style: none;
+  margin: 0 auto;
+  padding: 0;
+  width: 90%;
+}
