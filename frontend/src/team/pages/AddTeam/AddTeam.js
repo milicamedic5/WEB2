@@ -1,4 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
+import { useHistory } from "react-router-dom";
 import { AuthContext } from "../../../shared/context/auth-context";
 import { useAuth } from "../../../shared/hooks/auth-hook";
 import { useHttpClient } from "../../../shared/hooks/http-hook";
@@ -14,11 +15,11 @@ import "./AddTeam.css";
 
 const AddTeam = () => {
   const auth = useContext(AuthContext);
+  const history = useHistory();
   const { isLoading, error, sendRequest, clearError } = useHttpClient();
   const { token, login, logout, userId, role } = useAuth();
   const [loadedUsers, setLoadedUsers] = useState([]);
   const [members, setMembers] = useState([]);
-  const [errorMembers, setErrorMembers] = useState(false);
   const [formState, inputHandler, setFormData] = useForm(
     {
       name: {
@@ -32,7 +33,7 @@ const AddTeam = () => {
   useEffect(async () => {
     try {
       const responseData = await sendRequest(
-        "http://localhost:5000/api/user/get-all",
+        "http://localhost:5000/api/user/get-team-members",
         "GET",
         null,
         {
@@ -40,11 +41,9 @@ const AddTeam = () => {
         }
       );
       setLoadedUsers(
-        responseData
-          .filter((x) => x.role === "Dispecer")
-          .map((user) => {
-            return { ...user, minusDisabled: true, plusDisabled: false };
-          })
+        responseData.map((user) => {
+          return { ...user, minusDisabled: true, plusDisabled: false };
+        })
       );
     } catch (err) {
       console.log(err);
@@ -73,16 +72,27 @@ const AddTeam = () => {
     newArrayAllUsers[userIndexAllUsers].plusDisabled = true;
     newArrayAllUsers[userIndexAllUsers].minusDisabled = false;
     setLoadedUsers((prevState) => (prevState = newArrayAllUsers));
-    setErrorMembers(false);
     setMembers((prevState) => [...prevState, userId]);
   };
 
-  const addTeamHandler = (event) => {
+  const addTeamHandler = async (event) => {
     event.preventDefault();
     // poslati zahtev ka backu za dodavanje novog TIMA
-    if (members.length === 0) {
-      setErrorMembers(true);
-    }
+    try {
+      const responseData = await sendRequest(
+        "http://localhost:5000/api/team/add",
+        "POST",
+        JSON.stringify({
+          Name: formState.inputs.name.value,
+          MembersIds: members,
+        }),
+        {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ` + auth.token,
+        }
+      );
+      history.push("/teams");
+    } catch (error) {}
     console.log(members);
   };
 

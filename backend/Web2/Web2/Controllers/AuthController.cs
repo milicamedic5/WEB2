@@ -137,15 +137,15 @@ namespace Web2
 
 				var role = (await unitOfWork.AuthRepository.GetRoles(user)).FirstOrDefault();
 
-				if (user.Status == "Waiting" && role != "Admin")
-				{
-					return BadRequest(new { message = "You are not approved by admin yet. Soon you will be notified about your status changes." });
-				}
+				//if (user.Status == "Waiting" && role != "Admin")
+				//{
+				//	return BadRequest(new { message = "You are not approved by admin yet. Soon you will be notified about your status changes." });
+				//}
 
-				if (user.Status == "Denied" && role != "Admin")
-				{
-					return BadRequest(new { message = "Sorry, your account was denied from access to application." });
-				}
+				//if (user.Status == "Denied" && role != "Admin")
+				//{
+				//	return BadRequest(new { message = "Sorry, your account was denied from access to application." });
+				//}
 
 				var tokenDescriptor = new SecurityTokenDescriptor
 				{

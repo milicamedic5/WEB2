@@ -12,12 +12,12 @@ const TeamsList = (props) => {
   return (
     <ul className="teams-list">
       {props.items.map((item) => (
-        <div>
+        <div key={item.id}>
           <TeamItem
             id={item.id}
-            key={item.id}
             name={item.name}
             members={item.members}
+            onDeleteItem={props.onDelete}
           />
           <hr />
         </div>

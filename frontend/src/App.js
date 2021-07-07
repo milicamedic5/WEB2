@@ -14,6 +14,7 @@ import Teams from "./team/pages/Teams/Teams";
 import AddTeam from "./team/pages/AddTeam/AddTeam";
 import WorkRequests from "./work-request/pages/WorkRequests/WorkRequests";
 import Map from "./map/Map/Map";
+import UpdateTeam from "./team/pages/UpdateTeam/UpdateTeam";
 
 const App = () => {
   const { token, login, logout, userId, role } = useAuth();
@@ -31,6 +32,9 @@ const App = () => {
           </Route>
           <Route path="/teams/add-team" exact>
             <AddTeam />
+          </Route>
+          <Route path="/teams/:id" exact>
+            <UpdateTeam />
           </Route>
           <Route path="/map" exact>
             <Map center={{ lat: 45.267136, lng: 19.833549 }} zoom={16} />

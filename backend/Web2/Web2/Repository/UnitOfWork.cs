@@ -17,6 +17,7 @@ namespace Web2.Repository
 
 		private IAuthRepository authRepository;
 		private IUserRepository userRepository;
+		private ITeamRepository teamRepository;
 
 		public UnitOfWork(DataContext _context, RoleManager<IdentityRole> _roleManager,
 			UserManager<User> _userManager, SignInManager<User> _signInManager)
@@ -42,6 +43,15 @@ namespace Web2.Repository
 			{
 				return userRepository = userRepository ??
 					new UserRepository(this.context);
+			}
+		}
+
+		public ITeamRepository TeamRepository
+		{
+			get
+			{
+				return teamRepository = teamRepository ??
+					new TeamRepository(this.context);
 			}
 		}
 

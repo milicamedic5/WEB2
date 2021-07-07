@@ -13,6 +13,7 @@ namespace Web2.Repository
 		RoleManager<IdentityRole> RoleManager { get; }
 		IAuthRepository AuthRepository { get; }
 		IUserRepository UserRepository { get; }
+		ITeamRepository TeamRepository { get; }
 		Task Commit();
 		void Rollback();
 	}

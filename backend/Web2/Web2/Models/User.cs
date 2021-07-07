@@ -15,6 +15,7 @@ namespace Web2.Models
         public string Role { get; set; }
         public string Status { get; set; }
         public DateTime Birthday { get; set; }
+        public Team Team { get; set; }
         public User() {}
     }
 }

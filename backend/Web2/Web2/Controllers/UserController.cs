@@ -41,7 +41,7 @@ namespace Web2.Controllers
 
 				if (user == null)
 				{
-					return NotFound("User not found");
+					return NotFound(new { message = "User not found" });
 				}
 
 				var allUsers = await unitOfWork.UserRepository.GetAllUsers();
@@ -59,6 +59,51 @@ namespace Web2.Controllers
 						continue;
 					}
 
+					usersToReturn.Add(new
+					{
+						email = item.Email,
+						firstname = item.FirstName,
+						lastname = item.LastName,
+						id = item.Id,
+						role = item.Role,
+						status = item.Status
+					});
+				}
+				return Ok(usersToReturn);
+			}
+			catch (Exception)
+			{
+				return StatusCode(500, "Failed to return all users");
+			}
+		}
+
+		[HttpGet]
+		[Route("get-team-members")]
+		[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+		public async Task<IActionResult> GetTeamMembers()
+		{
+			try
+			{
+				string userId = User.Claims.First(c => c.Type == "UserID").Value;
+				var user = (User)await unitOfWork.UserManager.FindByIdAsync(userId);
+
+				string userRole = User.Claims.First(c => c.Type == "Roles").Value;
+
+				if (!userRole.Equals("Admin"))
+				{
+					return Unauthorized();
+				}
+
+				if (user == null)
+				{
+					return NotFound(new { message = "User not found" });
+				}
+
+				var allUsers = await unitOfWork.UserRepository.Get(x => x.Role == "Clan ekipe" && x.Team == null && x.Status == "Approved");
+				var usersToReturn = new List<object>();
+
+				foreach (var item in allUsers)
+				{
 					usersToReturn.Add(new
 					{
 						email = item.Email,
