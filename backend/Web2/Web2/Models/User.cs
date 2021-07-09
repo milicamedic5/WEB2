@@ -16,6 +16,10 @@ namespace Web2.Models
         public string Status { get; set; }
         public DateTime Birthday { get; set; }
         public Team Team { get; set; }
-        public User() {}
+        public virtual ICollection<WorkRequest> WorkRequests { get; set; }
+        public User() 
+        {
+            WorkRequests = new HashSet<WorkRequest>();
+        }
     }
 }

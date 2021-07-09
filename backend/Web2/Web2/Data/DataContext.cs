@@ -14,9 +14,11 @@ namespace Web2.Data
 		protected override void OnModelCreating(ModelBuilder modelBuilder)
 		{
 			modelBuilder.Entity<Team>().HasMany(t => t.Members).WithOne(u => u.Team);
+			modelBuilder.Entity<User>().HasMany(u => u.WorkRequests).WithOne(w => w.CreatedBy);
 			base.OnModelCreating(modelBuilder);
 		}
 		public DbSet<User> Users { get; set; }
 		public DbSet<Team> Teams { get; set; }
+		public DbSet<WorkRequest> WorkRequests { get; set; }
 	}
 }

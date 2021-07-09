@@ -1,0 +1,18 @@
+.add-workrequest__container {
+  display: grid;
+  grid-template-columns: 350px auto;
+}
+.add-workrequest__nav {
+  display: flex;
+  flex-direction: column;
+  height: auto;
+  margin: 0rem 0rem 0 2rem;
+  height: 360px;
+  background-color: white;
+  border-radius: 20px;
+  padding: 1rem;
+}
+
+.add-workrequest__nav button {
+  margin: 1rem;
+}

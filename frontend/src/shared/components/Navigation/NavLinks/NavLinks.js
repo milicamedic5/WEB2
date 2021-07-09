@@ -2,18 +2,16 @@ import React, { useContext } from "react";
 import { NavLink } from "react-router-dom";
 
 import { AuthContext } from "../../../context/auth-context";
-import { useAuth } from "../../../hooks/auth-hook";
 import "./NavLinks.css";
 
 const NavLinks = () => {
-  const { token, login, logout, userId, role } = useAuth();
   const auth = useContext(AuthContext);
 
   return (
     <ul className="nav-links">
       {auth.isLoggedIn && (
         <li>
-          <NavLink to={`/${userId}/workrequests`} exact>
+          <NavLink to={`/${auth.userId}/workrequests`} exact>
             WORK REQUESTS
           </NavLink>
         </li>

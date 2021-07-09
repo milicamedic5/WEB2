@@ -13,6 +13,7 @@ import Users from "./user/pages/Users/Users";
 import Teams from "./team/pages/Teams/Teams";
 import AddTeam from "./team/pages/AddTeam/AddTeam";
 import WorkRequests from "./work-request/pages/WorkRequests/WorkRequests";
+import AddWorkRequest from "./work-request/pages/AddWorkRequest/AddWorkRequest";
 import Map from "./map/Map/Map";
 import UpdateTeam from "./team/pages/UpdateTeam/UpdateTeam";
 
@@ -41,6 +42,9 @@ const App = () => {
           </Route>
           <Route path="/:userId/workrequests" exact>
             <WorkRequests />
+          </Route>
+          <Route path="/:userId/workrequests/add-workrequest" exact>
+            <AddWorkRequest />
           </Route>
           <Redirect to="/map" />
         </Switch>

@@ -5,6 +5,7 @@ import Button from "../../../shared/components/FormElements/Button/Button";
 import Input from "../../../shared/components/FormElements/Input/Input";
 import Card from "../../../shared/components/UIElements/Card/Card";
 import ErrorModal from "../../../shared/components/UIElements/ErrorModal/ErrorModal";
+import LoadingSpinner from "../../../shared/components/UIElements/LoadingSpinner/LoadingSpinner";
 import {
   VALIDATOR_EMAIL,
   VALIDATOR_MINLENGTH,
@@ -100,10 +101,7 @@ const Auth = () => {
         return formState.inputs.role.value === "Clan ekipe" ? true : false;
       });
     }
-  }, [
-    formState.inputs.role ? formState.inputs.role.value : null,
-    formState.inputs.role,
-  ]);
+  }, [formState.inputs.role]);
 
   const authSubmitHandler = async (event) => {
     event.preventDefault();
@@ -140,7 +138,7 @@ const Auth = () => {
       formData.append("Address", formState.inputs.address.value);
       //formData.append('image', formState.inputs.image.value);
       try {
-        const responseData = await sendRequest(
+        await sendRequest(
           "http://localhost:5000/api/auth/signup",
           "POST",
           formData
@@ -162,6 +160,7 @@ const Auth = () => {
   return (
     <React.Fragment>
       <ErrorModal error={error} onClear={clearError} />
+      {isLoading && <LoadingSpinner asOverlay />}
       <Card
         className={`authentication ${
           isLoginMode ? "" : "authentication__signup"

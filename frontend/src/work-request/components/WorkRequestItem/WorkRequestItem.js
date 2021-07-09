@@ -6,10 +6,11 @@ import Modal from "../../../shared/components/UIElements/Modal/Modal";
 import ErrorModal from "../../../shared/components/UIElements/ErrorModal/ErrorModal";
 import LoadingSpinner from "../../../shared/components/UIElements/LoadingSpinner/LoadingSpinner";
 
-import "./TeamItem.css";
 import { AuthContext } from "../../../shared/context/auth-context";
 
-const TeamItem = (props) => {
+import "./WorkRequestItem.css";
+
+const WorkRequestItem = (props) => {
   const auth = useContext(AuthContext);
   const { isLoading, error, sendRequest, clearError } = useHttpClient();
   const [showConfirmModal, setShowConfirmModal] = useState(false);
@@ -23,18 +24,18 @@ const TeamItem = (props) => {
   };
 
   const confirmDeleteHandler = async () => {
-    setShowConfirmModal(false);
-    try {
-      await sendRequest(
-        `http://localhost:5000/api/team/delete/${props.id}`,
-        "DELETE",
-        null,
-        { Authorization: "Bearer " + auth.token }
-      );
-      props.onDeleteItem(props.id);
-    } catch (error) {}
+    // setShowConfirmModal(false);
+    // try {
+    //   await sendRequest(
+    //     `http://localhost:5000/api/team/delete/${props.id}`,
+    //     "DELETE",
+    //     null,
+    //     { Authorization: "Bearer " + auth.token }
+    //   );
+    //   props.onDeleteItem(props.id);
+    // } catch (error) {}
+    props.onDeleteItem(props.id);
   };
-
   return (
     <React.Fragment>
       {isLoading && <LoadingSpinner asOverlay />}
@@ -56,35 +57,27 @@ const TeamItem = (props) => {
         }
       >
         <p>
-          Do you want to proceed and delete this team? Please note that it can't
-          be undone thereafter.
+          Do you want to proceed and delete this work request? Please note that
+          it can't be undone thereafter.
         </p>
       </Modal>
-      <li className="user-item">
-        <div>
-          <h3 className="user-item__name">{props.name}</h3>
-          <div className="user-item__members">
-            {props.members &&
-              props.members.map((member) => (
-                <div key={member.id} className="user-item__member">
-                  <span>{member.firstname} | </span>
-                  <span>{member.lastname} | </span>
-                  <span>{member.email}</span>
-                </div>
-              ))}
-          </div>
-        </div>
-        <div className="user-item__buttons">
+      <tr className="workrequest-item__tr">
+        <td className="workrequest-item__td">{props.id}</td>
+        <td className="workrequest-item__td">{props.startdate}</td>
+        <td className="workrequest-item__td">{props.phone}</td>
+        <td className="workrequest-item__td">{props.status}</td>
+        <td className="workrequest-item__td">{props.address}</td>
+        <td className="workrequest-item__buttons">
           <Button edit to={`/teams/${props.id}`}>
             EDIT
           </Button>
           <Button inverse onClick={showDeleteHandler}>
             DELETE
           </Button>
-        </div>
-      </li>
+        </td>
+      </tr>
     </React.Fragment>
   );
 };
 
-export default TeamItem;
+export default WorkRequestItem;

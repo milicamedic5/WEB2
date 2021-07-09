@@ -2,13 +2,13 @@ import React, { useContext, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useHistory } from "react-router-dom";
 import { AuthContext } from "../../../shared/context/auth-context";
-import { useAuth } from "../../../shared/hooks/auth-hook";
 import { useHttpClient } from "../../../shared/hooks/http-hook";
 import { VALIDATOR_REQUIRE } from "../../../shared/util/validators";
 import Input from "../../../shared/components/FormElements/Input/Input";
 import Button from "../../../shared/components/FormElements/Button/Button";
 import Card from "../../../shared/components/UIElements/Card/Card";
 import ErrorModal from "../../../shared/components/UIElements/ErrorModal/ErrorModal";
+import LoadingSpinner from "../../../shared/components/UIElements/LoadingSpinner/LoadingSpinner";
 import UsersList from "../../../user/components/UsersList/UsersList";
 import { useForm } from "../../../shared/hooks/form-hook";
 
@@ -17,10 +17,8 @@ const UpdateTeam = (props) => {
   const auth = useContext(AuthContext);
   const history = useHistory();
   const { isLoading, error, sendRequest, clearError } = useHttpClient();
-  const { token, login, logout, userId, role } = useAuth();
   const [team, setTeam] = useState();
   const [members, setMembers] = useState([]);
-  const [ok, setOk] = useState(false);
   const [formState, inputHandler, setFormData] = useForm(
     {
       name: {
@@ -85,7 +83,7 @@ const UpdateTeam = (props) => {
     };
     fetchTeam();
     console.log(formState);
-  }, []);
+  }, [sendRequest, auth.token, formState, setFormData, teamId]);
   //wafafwafwafwaaaaa
   //wafafwafwafwaaaaa
   const removeMemberHandler = (userId) => {
@@ -140,6 +138,7 @@ const UpdateTeam = (props) => {
     <React.Fragment>
       {/* errorModal and loadingSpinner */}
       <ErrorModal error={error} onClear={clearError} />
+      {isLoading && <LoadingSpinner asOverlay />}
       {team && (
         <Card className="update-team__form">
           <form onSubmit={updateTeamHandler}>

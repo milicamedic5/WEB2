@@ -1,0 +1,21 @@
+.add-workrequest__basic-information_card {
+  margin: 0 5rem 0 auto;
+  width: calc(80% - 2rem);
+}
+
+.add-workrequest__basic-information_card form {
+  display: grid;
+  grid-template-columns: auto auto;
+  gap: 0 4rem;
+  padding: 3rem;
+}
+
+.add-workrequest__basic-information_emergency-work label,
+.add-workrequest__basic-information_emergency-work input {
+  display: inline-block;
+  width: auto;
+}
+
+.add-workrequest__basic-information_emergency-work input {
+  margin-left: 8px;
+}

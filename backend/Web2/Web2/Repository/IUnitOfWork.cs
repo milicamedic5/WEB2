@@ -14,6 +14,7 @@ namespace Web2.Repository
 		IAuthRepository AuthRepository { get; }
 		IUserRepository UserRepository { get; }
 		ITeamRepository TeamRepository { get; }
+		IWorkRequestRepository WorkRequestRepository { get; }
 		Task Commit();
 		void Rollback();
 	}

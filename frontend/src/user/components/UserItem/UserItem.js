@@ -3,6 +3,8 @@ import { useHttpClient } from "../../../shared/hooks/http-hook";
 
 import Button from "../../../shared/components/FormElements/Button/Button";
 import Card from "../../../shared/components/UIElements/Card/Card";
+import ErrorModal from "../../../shared/components/UIElements/ErrorModal/ErrorModal";
+import LoadingSpinner from "../../../shared/components/UIElements/LoadingSpinner/LoadingSpinner";
 import "./UserItem.css";
 import { AuthContext } from "../../../shared/context/auth-context";
 
@@ -13,7 +15,7 @@ const UserItem = (props) => {
   const userDeniedHandler = async () => {
     const status = "Denied";
     try {
-      const responseData = await sendRequest(
+      await sendRequest(
         "http://localhost:5000/api/user/set-status",
         "POST",
         JSON.stringify({
@@ -34,7 +36,7 @@ const UserItem = (props) => {
   const userApprovedHandler = async () => {
     const status = "Approved";
     try {
-      const responseData = await sendRequest(
+      await sendRequest(
         "http://localhost:5000/api/user/set-status",
         "POST",
         JSON.stringify({
@@ -54,6 +56,8 @@ const UserItem = (props) => {
 
   return (
     <li className="user-item">
+      <ErrorModal error={error} onClear={clearError} />
+      {isLoading && <LoadingSpinner />}
       <Card className="user-item__content">
         <div>
           <div className="user-item__info">

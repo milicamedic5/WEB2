@@ -1,13 +1,13 @@
 import React, { useContext, useEffect, useState } from "react";
 import { useHistory } from "react-router-dom";
 import { AuthContext } from "../../../shared/context/auth-context";
-import { useAuth } from "../../../shared/hooks/auth-hook";
 import { useHttpClient } from "../../../shared/hooks/http-hook";
 import { VALIDATOR_REQUIRE } from "../../../shared/util/validators";
 import Input from "../../../shared/components/FormElements/Input/Input";
 import Button from "../../../shared/components/FormElements/Button/Button";
 import Card from "../../../shared/components/UIElements/Card/Card";
 import ErrorModal from "../../../shared/components/UIElements/ErrorModal/ErrorModal";
+import LoadingSpinner from "../../../shared/components/UIElements/LoadingSpinner/LoadingSpinner";
 import UsersList from "../../../user/components/UsersList/UsersList";
 import { useForm } from "../../../shared/hooks/form-hook";
 
@@ -17,10 +17,9 @@ const AddTeam = () => {
   const auth = useContext(AuthContext);
   const history = useHistory();
   const { isLoading, error, sendRequest, clearError } = useHttpClient();
-  const { token, login, logout, userId, role } = useAuth();
   const [loadedUsers, setLoadedUsers] = useState([]);
   const [members, setMembers] = useState([]);
-  const [formState, inputHandler, setFormData] = useForm(
+  const [formState, inputHandler] = useForm(
     {
       name: {
         value: "",
@@ -30,25 +29,28 @@ const AddTeam = () => {
     false
   );
 
-  useEffect(async () => {
-    try {
-      const responseData = await sendRequest(
-        "http://localhost:5000/api/user/get-team-members",
-        "GET",
-        null,
-        {
-          Authorization: "Bearer " + auth.token,
-        }
-      );
-      setLoadedUsers(
-        responseData.map((user) => {
-          return { ...user, minusDisabled: true, plusDisabled: false };
-        })
-      );
-    } catch (err) {
-      console.log(err);
-    }
-  }, []);
+  useEffect(() => {
+    const fetchTeamMembers = async () => {
+      try {
+        const responseData = await sendRequest(
+          "http://localhost:5000/api/user/get-team-members",
+          "GET",
+          null,
+          {
+            Authorization: "Bearer " + auth.token,
+          }
+        );
+        setLoadedUsers(
+          responseData.map((user) => {
+            return { ...user, minusDisabled: true, plusDisabled: false };
+          })
+        );
+      } catch (err) {
+        console.log(err);
+      }
+    };
+    fetchTeamMembers();
+  }, [sendRequest, auth.token]);
 
   const removeMemberHandler = (userId) => {
     const userIndexAllUsers = loadedUsers.indexOf(
@@ -79,7 +81,7 @@ const AddTeam = () => {
     event.preventDefault();
     // poslati zahtev ka backu za dodavanje novog TIMA
     try {
-      const responseData = await sendRequest(
+      await sendRequest(
         "http://localhost:5000/api/team/add",
         "POST",
         JSON.stringify({
@@ -100,6 +102,7 @@ const AddTeam = () => {
     <React.Fragment>
       {/* errorModal and loadingSpinner */}
       <ErrorModal error={error} onClear={clearError} />
+      {isLoading && <LoadingSpinner asOverlay />}
       <Card className="add-team__form">
         <form onSubmit={addTeamHandler}>
           <Input

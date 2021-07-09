@@ -1,0 +1,10 @@
+.workrequest-item__tr {
+  line-height: 2rem;
+}
+.workrequest-item__td {
+  padding: 0 2rem;
+}
+
+.workrequest-item__buttons {
+  padding: 0 auto;
+}

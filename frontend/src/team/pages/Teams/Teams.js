@@ -4,6 +4,7 @@ import { useHistory } from "react-router-dom";
 import Button from "../../../shared/components/FormElements/Button/Button";
 import Card from "../../../shared/components/UIElements/Card/Card";
 import ErrorModal from "../../../shared/components/UIElements/ErrorModal/ErrorModal";
+import LoadingSpinner from "../../../shared/components/UIElements/LoadingSpinner/LoadingSpinner";
 import { AuthContext } from "../../../shared/context/auth-context";
 import { useHttpClient } from "../../../shared/hooks/http-hook";
 
@@ -16,19 +17,22 @@ const Teams = () => {
   const auth = useContext(AuthContext);
   const history = useHistory();
 
-  useEffect(async () => {
-    try {
-      const responseData = await sendRequest(
-        "http://localhost:5000/api/team/get-all",
-        "GET",
-        null,
-        {
-          Authorization: "Bearer " + auth.token,
-        }
-      );
-      setTeams(responseData);
-    } catch (err) {}
-  }, []);
+  useEffect(() => {
+    const fetchAll = async () => {
+      try {
+        const responseData = await sendRequest(
+          "http://localhost:5000/api/team/get-all",
+          "GET",
+          null,
+          {
+            Authorization: "Bearer " + auth.token,
+          }
+        );
+        setTeams(responseData);
+      } catch (err) {}
+    };
+    fetchAll();
+  }, [sendRequest, auth.token]);
 
   const addTeamHandler = () => {
     history.push("/teams/add-team");
@@ -42,6 +46,7 @@ const Teams = () => {
   return (
     <React.Fragment>
       <ErrorModal error={error} onClear={clearError} />
+      {isLoading && <LoadingSpinner asOverlay />}
       <Card className="teams__card">
         <Button onClick={addTeamHandler} add right>
           ADD NEW

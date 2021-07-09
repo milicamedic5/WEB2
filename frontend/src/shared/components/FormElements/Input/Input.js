@@ -23,7 +23,7 @@ const inputReducer = (state, action) => {
 
 const Input = (props) => {
   const [inputState, dispatch] = useReducer(inputReducer, {
-    value: props.initialValue || '',
+    value: props.initialValue || "",
     isTouched: false,
     isValid: props.initialValid || false,
   });
@@ -58,25 +58,30 @@ const Input = (props) => {
         onChange={changeHandler}
         onBlur={touchHandler}
         value={inputState.value}
+        disabled={props.disabled}
       />
-    ) : 
-    props.element === "select" ?
-    (
+    ) : props.element === "select" ? (
       <select
         id={props.id}
         onChange={changeHandler}
         onBlur={touchHandler}
         value={inputState.value}
       >
-        {props.selectOptions && props.selectOptions.map(o => {
-          return (
-            <option key={o.value}>{o.value}</option>
-          );
-        })}
+        {props.selectOptions &&
+          props.selectOptions.map((o) => {
+            return <option key={o.value}>{o.value}</option>;
+          })}
       </select>
-    )
-    :
-    (
+    ) : props.element === "checkbox" ? (
+      <input
+        id={props.id}
+        type={props.type}
+        onChange={changeHandler}
+        onBlur={touchHandler}
+        value={inputState.value}
+        disabled={props.disabled}
+      />
+    ) : (
       <textarea
         id={props.id}
         rows={props.rows || 3}

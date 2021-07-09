@@ -78,6 +78,33 @@ namespace Web2.Controllers
 		}
 
 		[HttpGet]
+		[Route("get/{id}")]
+		[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+		public async Task<IActionResult> Get(string id)
+		{
+			try
+			{
+				string userId = User.Claims.First(c => c.Type == "UserID").Value;
+				var user = (User)await unitOfWork.UserManager.FindByIdAsync(userId);
+
+				string userRole = User.Claims.First(c => c.Type == "Roles").Value;
+
+				if (user == null)
+				{
+					return NotFound(new { message = "User not found" });
+				}
+
+				var _user = (await unitOfWork.UserRepository.Get(u => u.Id == id)).FirstOrDefault();
+
+				return Ok(new { firstname = _user.FirstName, lastname = _user.LastName});
+			}
+			catch (Exception)
+			{
+				return StatusCode(500, "Failed to return user");
+			}
+		}
+
+		[HttpGet]
 		[Route("get-team-members")]
 		[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 		public async Task<IActionResult> GetTeamMembers()
