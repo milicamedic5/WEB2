@@ -8,65 +8,79 @@ import ErrorModal from "../../../shared/components/UIElements/ErrorModal/ErrorMo
 import { VALIDATOR_REQUIRE } from "../../../shared/util/validators";
 import { useForm } from "../../../shared/hooks/form-hook";
 import { useHttpClient } from "../../../shared/hooks/http-hook";
+import { useHistory } from "react-router";
 
 import "./BasicInformation.css";
 
 const BasicInformation = (props) => {
+  console.log(props.workRequest);
   const [isTeamMemberRole, setIsTeamMemberRole] = useState(false);
   const { isLoading, error, sendRequest, clearError } = useHttpClient();
   const auth = useContext(AuthContext);
+  const history = useHistory();
   const [formState, inputHandler, setFormData] = useForm(
     {
       type: {
-        value: "Planned Work",
+        value: (props.workRequest && props.workRequest.type) || "Planned Work",
         isValid: true,
       },
       status: {
-        value: "Draft",
+        value: (props.workRequest && props.workRequest.status) || "Draft",
         isValid: true,
       },
       incident: {
-        value: "INC1",
+        value: (props.workRequest && props.workRequest.incident) || "INC1",
         isValid: true,
       },
       startdate: {
-        value: "",
-        isValid: false,
+        value:
+          props.workRequest && props.workRequest.startdate
+            ? new Date(props.workRequest.startdate)
+            : "",
+        isValid:
+          props.workRequest && props.workRequest.startdate ? true : false,
       },
       enddate: {
-        value: "",
-        isValid: false,
+        value:
+          props.workRequest && props.workRequest.enddate
+            ? new Date(props.workRequest.enddate)
+            : "",
+        isValid: props.workRequest && props.workRequest.enddate ? true : false,
       },
       createdby: {
-        value: props.user,
+        value: props.workRequest && props.user,
         isValid: true,
       },
       purpose: {
-        value: "",
-        isValid: false,
+        value: (props.workRequest && props.workRequest.purpose) || "",
+        isValid: props.workRequest && props.workRequest.type ? true : false,
       },
       details: {
-        value: "",
-        isValid: false,
+        value: (props.workRequest && props.workRequest.details) || "",
+        isValid: props.workRequest && props.workRequest.details ? true : false,
       },
       notes: {
-        value: "",
-        isValid: false,
+        value: (props.workRequest && props.workRequest.notes) || "",
+        isValid: props.workRequest && props.workRequest.notes ? true : false,
       },
       emergencywork: {
-        value: "false",
+        value:
+          (props.workRequest && props.workRequest.emergencywork) || "false",
         isValid: true,
       },
       company: {
-        value: "",
-        isValid: false,
+        value: (props.workRequest && props.workRequest.company) || "",
+        isValid: props.workRequest && props.workRequest.company ? true : false,
       },
       phone: {
-        value: "",
-        isValid: false,
+        value: (props.workRequest && props.workRequest.phone) || "",
+        isValid: props.workRequest && props.workRequest.phone ? true : false,
       },
       createddate: {
-        value: new Date().toLocaleDateString(),
+        value:
+          props.workRequest && props.workRequest.createddate
+            ? new Date(props.workRequest.createddate)
+            : new Date().toLocaleDateString(),
         isValid: true,
       },
     },
@@ -76,31 +90,58 @@ const BasicInformation = (props) => {
   const formSubmitHandler = async (event) => {
     event.preventDefault();
     console.log(formState.inputs);
-    try {
-      await sendRequest(
-        "http://localhost:5000/api/workrequest/add",
-        "POST",
-        JSON.stringify({
-          Type: formState.inputs.type.value,
-          Status: formState.inputs.status.value,
-          Incident: formState.inputs.incident.value,
-          StartDate: formState.inputs.startdate.value,
-          EndDate: formState.inputs.enddate.value,
-          CreatedBy: props.userId,
-          Purpose: formState.inputs.purpose.value,
-          Details: formState.inputs.details.value,
-          Notes: formState.inputs.notes.value,
-          Company: formState.inputs.company.value,
-          Phone: formState.inputs.phone.value,
-          CreatedDate: formState.inputs.createddate.value,
-          EmergencyWork: formState.inputs.emergencywork.value,
-        }),
-        {
-          "Content-Type": "application/json",
-          Authorization: "Bearer " + auth.token,
-        }
-      );
-    } catch (err) {}
+    if (props.workRequest) {
+      try {
+        await sendRequest(
+          `http://localhost:5000/api/workrequest/${props.workRequest.id}`,
+          "PATCH",
+          JSON.stringify({
+            Type: formState.inputs.type.value,
+            Status: formState.inputs.status.value,
+            Incident: formState.inputs.incident.value,
+            StartDate: formState.inputs.startdate.value,
+            EndDate: formState.inputs.enddate.value,
+            Purpose: formState.inputs.purpose.value,
+            Details: formState.inputs.details.value,
+            Notes: formState.inputs.notes.value,
+            Company: formState.inputs.company.value,
+            Phone: formState.inputs.phone.value,
+            EmergencyWork: formState.inputs.emergencywork.value,
+          }),
+          {
+            "Content-Type": "application/json",
+            Authorization: "Bearer " + auth.token,
+          }
+        );
+        history.push(`/${auth.userId}/workrequests`);
+      } catch (error) {}
+    } else {
+      try {
+        await sendRequest(
+          "http://localhost:5000/api/workrequest/add",
+          "POST",
+          JSON.stringify({
+            Type: formState.inputs.type.value,
+            Status: formState.inputs.status.value,
+            Incident: formState.inputs.incident.value,
+            StartDate: formState.inputs.startdate.value,
+            EndDate: formState.inputs.enddate.value,
+            CreatedBy: props.userId,
+            Purpose: formState.inputs.purpose.value,
+            Details: formState.inputs.details.value,
+            Notes: formState.inputs.notes.value,
+            Company: formState.inputs.company.value,
+            Phone: formState.inputs.phone.value,
+            CreatedDate: formState.inputs.createddate.value,
+            EmergencyWork: formState.inputs.emergencywork.value,
+          }),
+          {
+            "Content-Type": "application/json",
+            Authorization: "Bearer " + auth.token,
+          }
+        );
+      } catch (err) {}
+    }
   };
 
   return (
@@ -115,7 +156,9 @@ const BasicInformation = (props) => {
             onInput={inputHandler}
             validators={[VALIDATOR_REQUIRE()]}
             errorText="Please pick a type."
-            initialValue="Planned Work"
+            initialValue={
+              (props.workRequest && props.workRequest.type) || "Planned Work"
+            }
             initialValid={true}
             selectOptions={[
               { value: "Planned Work" },
@@ -127,7 +170,9 @@ const BasicInformation = (props) => {
             element="input"
             label="Status:"
             type="text"
-            initialValue="Draft"
+            initialValue={
+              (props.workRequest && props.workRequest.status) || "Draft"
+            }
             initialValid={true}
             disabled={true}
             onInput={inputHandler}
@@ -141,7 +186,9 @@ const BasicInformation = (props) => {
             onInput={inputHandler}
             validators={[VALIDATOR_REQUIRE()]}
             errorText="Please pick an incident."
-            initialValue="INC1"
+            initialValue={
+              (props.workRequest && props.workRequest.incident) || "INC1"
+            }
             initialValid={true}
             selectOptions={[
               { value: "INC1" },
@@ -156,6 +203,14 @@ const BasicInformation = (props) => {
             type="date"
             onInput={inputHandler}
             validators={[VALIDATOR_REQUIRE()]}
+            initialValue={
+              props.workRequest && props.workRequest.startdate
+                ? new Date(props.workRequest.startdate)
+                : ""
+            }
+            initialValid={
+              props.workRequest && props.workRequest.startdate ? true : false
+            }
             errorText="Please pick start date.time."
           />
           <Input
@@ -164,6 +219,12 @@ const BasicInformation = (props) => {
             label="End date/time:"
             type="date"
             onInput={inputHandler}
+            initialValue={
+              (props.workRequest && props.workRequest.enddate) || ""
+            }
+            initialValid={
+              props.workRequest && props.workRequest.enddate ? true : false
+            }
             validators={[VALIDATOR_REQUIRE()]}
             errorText="Please pick end date.time."
           />
@@ -184,6 +245,12 @@ const BasicInformation = (props) => {
             label="Purpose:"
             type="text"
             onInput={inputHandler}
+            initialValue={
+              (props.workRequest && props.workRequest.purpose) || ""
+            }
+            initialValid={
+              props.workRequest && props.workRequest.purpose ? true : false
+            }
             validators={[VALIDATOR_REQUIRE()]}
             errorText="Please enter purpose of work request."
           />
@@ -192,6 +259,12 @@ const BasicInformation = (props) => {
             label="Details:"
             type="text"
             onInput={inputHandler}
+            initialValue={
+              (props.workRequest && props.workRequest.details) || ""
+            }
+            initialValid={
+              props.workRequest && props.workRequest.details ? true : false
+            }
             validators={[VALIDATOR_REQUIRE()]}
             errorText="Please enter details of work request."
           />
@@ -200,6 +273,10 @@ const BasicInformation = (props) => {
             label="Notes:"
             type="text"
             onInput={inputHandler}
+            initialValue={(props.workRequest && props.workRequest.notes) || ""}
+            initialValid={
+              props.workRequest && props.workRequest.notes ? true : false
+            }
             validators={[VALIDATOR_REQUIRE()]}
             errorText="Please enter notes of work request."
           />
@@ -208,6 +285,12 @@ const BasicInformation = (props) => {
             element="input"
             label="Company:"
             type="text"
+            initialValue={
+              (props.workRequest && props.workRequest.company) || ""
+            }
+            initialValid={
+              props.workRequest && props.workRequest.company ? true : false
+            }
             onInput={inputHandler}
             validators={[VALIDATOR_REQUIRE()]}
             errorText="Please pick company."
@@ -217,6 +300,10 @@ const BasicInformation = (props) => {
             element="input"
             label="Phone No:"
             type="tel"
+            initialValue={(props.workRequest && props.workRequest.phone) || ""}
+            initialValid={
+              props.workRequest && props.workRequest.phone ? true : false
+            }
             onInput={inputHandler}
             validators={[VALIDATOR_REQUIRE()]}
             errorText="Please enter phone number."
@@ -228,7 +315,10 @@ const BasicInformation = (props) => {
             type="text"
             onInput={inputHandler}
             validators={[VALIDATOR_REQUIRE()]}
-            initialValue={new Date().toLocaleDateString()}
+            initialValue={
+              (props.workRequest && props.workRequest.createddate) ||
+              new Date().toLocaleDateString()
+            }
             initialValid={true}
             disabled={true}
             errorText="Please enter date of creation."
@@ -242,7 +332,10 @@ const BasicInformation = (props) => {
               onInput={inputHandler}
               validators={[]}
               initialValid={true}
-              initialValue="false"
+              initialValue={
+                (props.workRequest && props.workRequest.emergencywork) ||
+                "false"
+              }
               checked={false}
             />
           </div>

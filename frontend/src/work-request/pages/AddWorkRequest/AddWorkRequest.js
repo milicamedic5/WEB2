@@ -6,6 +6,7 @@ import Button from "../../../shared/components/FormElements/Button/Button";
 import Card from "../../../shared/components/UIElements/Card/Card";
 import ErrorModal from "../../../shared/components/UIElements/ErrorModal/ErrorModal";
 import LoadingSpinner from "../../../shared/components/UIElements/LoadingSpinner/LoadingSpinner";
+import Modal from "../../../shared/components/UIElements/Modal/Modal";
 import { useHttpClient } from "../../../shared/hooks/http-hook";
 // import { VALIDATOR_REQUIRE } from "../../../shared/util/validators";
 // import { useForm } from "../../../shared/hooks/form-hook";
@@ -20,10 +21,15 @@ const EQUIPMENT = "EQUIPMENT";
 
 const AddWorkRequest = () => {
   const userId = useParams().userId;
+  const id = useParams().id;
   const auth = useContext(AuthContext);
   const [activeButton, setActiveButton] = useState(BASIC_INFO);
+  const [wantedButton, setWantedButton] = useState(BASIC_INFO);
   const { isLoading, error, sendRequest, clearError } = useHttpClient();
   const [loggedUser, setLoggedUser] = useState();
+  const [workRequest, setWorkRequest] = useState();
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  let tempType;
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -36,6 +42,17 @@ const AddWorkRequest = () => {
             Authorization: "Bearer " + auth.token,
           }
         );
+        if (id) {
+          const responseDataWorkRequest = await sendRequest(
+            `http://localhost:5000/api/workrequest/get/${id}`,
+            "GET",
+            null,
+            {
+              Authorization: "Bearer " + auth.token,
+            }
+          );
+          setWorkRequest(responseDataWorkRequest);
+        }
         setLoggedUser(responseData);
       } catch (err) {
         console.log(err);
@@ -46,6 +63,28 @@ const AddWorkRequest = () => {
 
   const buttonHandler = (type) => {
     switch (type) {
+      case BASIC_INFO:
+        setWantedButton((prevState) => (prevState = BASIC_INFO));
+        break;
+      case HISTORY_OF_STATE_CHANGES:
+        setWantedButton((prevState) => (prevState = HISTORY_OF_STATE_CHANGES));
+        break;
+      case MULTIMEDIA_ATTACHMENTS:
+        setWantedButton((prevState) => (prevState = MULTIMEDIA_ATTACHMENTS));
+        break;
+      case EQUIPMENT:
+        setWantedButton((prevState) => (prevState = EQUIPMENT));
+        break;
+      default:
+        setWantedButton((prevState) => (prevState = BASIC_INFO));
+        break;
+    }
+    showLeaveHandler();
+  };
+
+  const confirmLeaveHandler = () => {
+    cancelLeaveHandler();
+    switch (wantedButton) {
       case BASIC_INFO:
         setActiveButton((prevState) => (prevState = BASIC_INFO));
         break;
@@ -64,10 +103,37 @@ const AddWorkRequest = () => {
     }
   };
 
+  const showLeaveHandler = () => {
+    setShowConfirmModal(true);
+  };
+
+  const cancelLeaveHandler = () => {
+    setShowConfirmModal(false);
+  };
+
   return (
     <div className="add-workrequest__container">
       <ErrorModal error={error} onClear={clearError} />
       {isLoading && <LoadingSpinner asOverlay />}
+      <Modal
+        show={showConfirmModal}
+        onCancel={cancelLeaveHandler}
+        header="Are you sure?"
+        footerClass="place-item__modal-actions"
+        footer={
+          <React.Fragment>
+            <Button inverse onClick={cancelLeaveHandler}>
+              CANCEL
+            </Button>
+            <Button onClick={confirmLeaveHandler}>YES</Button>
+          </React.Fragment>
+        }
+      >
+        <p>
+          Are you sure you want to leave {activeButton}? Please save all the
+          changes you like first.
+        </p>
+      </Modal>
       {!isLoading && (
         <div className="add-workrequest__nav">
           <Button
@@ -100,6 +166,7 @@ const AddWorkRequest = () => {
         <BasicInformation
           user={loggedUser.firstname + " " + loggedUser.lastname}
           userId={userId}
+          workRequest={workRequest}
         />
       )}
       {/* {activeButton === BASIC_INFO && <BasicInformation userId={userId} />}

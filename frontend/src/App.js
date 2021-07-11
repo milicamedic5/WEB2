@@ -46,6 +46,9 @@ const App = () => {
           <Route path="/:userId/workrequests/add-workrequest" exact>
             <AddWorkRequest />
           </Route>
+          <Route path="/:userId/workrequests/:id" exact>
+            <AddWorkRequest />
+          </Route>
           <Redirect to="/map" />
         </Switch>
       );
@@ -57,6 +60,12 @@ const App = () => {
           </Route>
           <Route path="/:userId/workrequests" exact>
             <WorkRequests />
+          </Route>
+          <Route path="/:userId/workrequests/add-workrequest" exact>
+            <AddWorkRequest />
+          </Route>
+          <Route path="/:userId/workrequests/:id" exact>
+            <AddWorkRequest />
           </Route>
           <Redirect to="/map" />
         </Switch>

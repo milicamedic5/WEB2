@@ -24,17 +24,16 @@ const WorkRequestItem = (props) => {
   };
 
   const confirmDeleteHandler = async () => {
-    // setShowConfirmModal(false);
-    // try {
-    //   await sendRequest(
-    //     `http://localhost:5000/api/team/delete/${props.id}`,
-    //     "DELETE",
-    //     null,
-    //     { Authorization: "Bearer " + auth.token }
-    //   );
-    //   props.onDeleteItem(props.id);
-    // } catch (error) {}
-    props.onDeleteItem(props.id);
+    setShowConfirmModal(false);
+    try {
+      await sendRequest(
+        `http://localhost:5000/api/workrequest/delete/${props.id}`,
+        "DELETE",
+        null,
+        { Authorization: "Bearer " + auth.token }
+      );
+      props.onDeleteWorkRequest(props.id);
+    } catch (error) {}
   };
   return (
     <React.Fragment>
@@ -67,14 +66,16 @@ const WorkRequestItem = (props) => {
         <td className="workrequest-item__td">{props.phone}</td>
         <td className="workrequest-item__td">{props.status}</td>
         <td className="workrequest-item__td">{props.address}</td>
-        <td className="workrequest-item__buttons">
-          <Button edit to={`/teams/${props.id}`}>
-            EDIT
-          </Button>
-          <Button inverse onClick={showDeleteHandler}>
-            DELETE
-          </Button>
-        </td>
+        {props.creator === auth.userId && (
+          <td className="workrequest-item__buttons">
+            <Button edit to={`/${auth.userId}/workrequests/${props.id}`}>
+              EDIT
+            </Button>
+            <Button inverse onClick={showDeleteHandler}>
+              DELETE
+            </Button>
+          </td>
+        )}
       </tr>
     </React.Fragment>
   );

@@ -2,7 +2,3 @@
   min-width: 750px;
   overflow: auto;
 }
-
-.workrequests__table thead tr {
-  display: inline-block;
-}

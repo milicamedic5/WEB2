@@ -15,6 +15,8 @@ import "./WorkRequests.css";
 const WorkRequests = () => {
   const userId = useParams().userId;
   const [workRequests, setWorkRequests] = useState([]);
+  const [mineWorkRequests, setMineWorkRequests] = useState([]);
+  const [showAllWorkRequests, setShowAllWorkRequests] = useState(true);
   const { isLoading, error, sendRequest, clearError } = useHttpClient();
   const auth = useContext(AuthContext);
   const history = useHistory();
@@ -30,11 +32,22 @@ const WorkRequests = () => {
             Authorization: "Bearer " + auth.token,
           }
         );
+        const responseDataMine = await sendRequest(
+          "http://localhost:5000/api/workrequest/get-mine",
+          "GET",
+          null,
+          {
+            Authorization: "Bearer " + auth.token,
+          }
+        );
         setWorkRequests(responseData);
+        setMineWorkRequests(responseDataMine);
+        console.log(responseData);
+        console.log(responseDataMine);
       } catch (err) {}
     };
     fetchAll();
-  }, []);
+  }, [sendRequest, auth.token]);
 
   const addWorkRequestHandler = () => {
     history.push(`/${userId}/workrequests/add-workrequest`);
@@ -44,41 +57,46 @@ const WorkRequests = () => {
     setWorkRequests((prevState) =>
       prevState.filter((workRequest) => workRequest.id !== workRequestId)
     );
+    setMineWorkRequests((prevState) =>
+      prevState.filter((workRequest) => workRequest.id !== workRequestId)
+    );
   };
-  const items = [
-    {
-      id: 1,
-      startdate: "20/07/2021",
-      phone: "065/55-555-55",
-      status: "ok",
-      address: "Novi Sad",
-    },
-    {
-      id: 2,
-      startdate: "20/07/2021",
-      phone: "065/55-555-55",
-      status: "okkkkkKKKKK",
-      address: "Novi Sad",
-    },
-    {
-      id: 3,
-      startdate: "20/07/2021",
-      phone: "065/55-555-55",
-      status: "ok",
-      address: "Novi Sad",
-    },
-  ];
+
+  const workRequestListHandler = () => {
+    setShowAllWorkRequests((prevState) => !prevState);
+  };
+
   return (
     <React.Fragment>
       <ErrorModal error={error} onClear={clearError} />
       {isLoading && <LoadingSpinner asOverlay />}
+      <Card className="workrequest__card">
+        <Button
+          inverse={showAllWorkRequests ? false : true}
+          onClick={workRequestListHandler}
+        >
+          ALL
+        </Button>
+        <Button
+          inverse={!showAllWorkRequests ? false : true}
+          onClick={workRequestListHandler}
+        >
+          MINE
+        </Button>
+      </Card>
       <Card className="teams__card">
         <Button onClick={addWorkRequestHandler} add right>
           ADD NEW
         </Button>
-        {workRequests && (
+        {showAllWorkRequests && workRequests && (
           <WorkRequestsList
             items={workRequests}
+            onDelete={deleteWorkRequestHandler}
+          />
+        )}
+        {!showAllWorkRequests && mineWorkRequests && (
+          <WorkRequestsList
+            items={mineWorkRequests}
             onDelete={deleteWorkRequestHandler}
           />
         )}

@@ -2,6 +2,8 @@ import React from "react";
 
 import WorkRequestItem from "../WorkRequestItem/WorkRequestItem";
 
+import "./WorkRequestsList.css";
+
 const WorkRequestsList = (props) => {
   if (!props.items || props.items.length === 0) {
     return <h2 className="teams-list__content">No work requests added yet.</h2>;
@@ -27,6 +29,8 @@ const WorkRequestsList = (props) => {
             phone={item.phone}
             status={item.status}
             address={item.address}
+            creator={item.createdby}
+            onDeleteWorkRequest={props.onDelete}
           />
         ))}
       </tbody>

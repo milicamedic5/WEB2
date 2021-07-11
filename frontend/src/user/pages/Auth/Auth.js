@@ -161,164 +161,166 @@ const Auth = () => {
     <React.Fragment>
       <ErrorModal error={error} onClear={clearError} />
       {isLoading && <LoadingSpinner asOverlay />}
-      <Card
-        className={`authentication ${
-          isLoginMode ? "" : "authentication__signup"
-        }`}
-      >
-        {isLoginMode && <h2>Login Required</h2>}
-        {!isLoginMode && <h2>Register Account</h2>}
-        <hr />
-        <form
-          className={!isLoginMode && "form__signup"}
-          onSubmit={authSubmitHandler}
+      {!isLoading && (
+        <Card
+          className={`authentication ${
+            isLoginMode ? "" : "authentication__signup"
+          }`}
         >
-          {!isLoginMode && (
+          {isLoginMode && <h2>Login Required</h2>}
+          {!isLoginMode && <h2>Register Account</h2>}
+          <hr />
+          <form
+            className={!isLoginMode && "form__signup"}
+            onSubmit={authSubmitHandler}
+          >
+            {!isLoginMode && (
+              <Input
+                id="name"
+                element="input"
+                label="First Name"
+                type="text"
+                onInput={inputHandler}
+                validators={[VALIDATOR_REQUIRE()]}
+                errorText="Please enter a name."
+              />
+            )}
+            {!isLoginMode && (
+              <Input
+                id="lastname"
+                element="input"
+                label="Last Name"
+                type="text"
+                onInput={inputHandler}
+                validators={[VALIDATOR_REQUIRE()]}
+                errorText="Please enter a lastname."
+              />
+            )}
+            {!isLoginMode && (
+              <Input
+                id="username"
+                element="input"
+                label="Username"
+                type="text"
+                onInput={inputHandler}
+                validators={[VALIDATOR_REQUIRE()]}
+                errorText="Please enter a username."
+              />
+            )}
             <Input
-              id="name"
+              id="email"
+              label="Email"
+              type="email"
               element="input"
-              label="First Name"
-              type="text"
               onInput={inputHandler}
-              validators={[VALIDATOR_REQUIRE()]}
-              errorText="Please enter a name."
+              validators={[VALIDATOR_EMAIL()]}
+              errorText="Please enter a valid email."
             />
-          )}
-          {!isLoginMode && (
             <Input
-              id="lastname"
-              element="input"
-              label="Last Name"
-              type="text"
-              onInput={inputHandler}
-              validators={[VALIDATOR_REQUIRE()]}
-              errorText="Please enter a lastname."
-            />
-          )}
-          {!isLoginMode && (
-            <Input
-              id="username"
-              element="input"
-              label="Username"
-              type="text"
-              onInput={inputHandler}
-              validators={[VALIDATOR_REQUIRE()]}
-              errorText="Please enter a username."
-            />
-          )}
-          <Input
-            id="email"
-            label="Email"
-            type="email"
-            element="input"
-            onInput={inputHandler}
-            validators={[VALIDATOR_EMAIL()]}
-            errorText="Please enter a valid email."
-          />
-          <Input
-            id="password"
-            label="Password"
-            type="password"
-            element="input"
-            onInput={inputHandler}
-            validators={[VALIDATOR_MINLENGTH(6)]}
-            errorText="Password should be at least 6 characters long."
-          />
-          {!isLoginMode && (
-            <Input
-              id="confirmPassword"
-              element="input"
-              label="Confirm Password"
+              id="password"
+              label="Password"
               type="password"
+              element="input"
               onInput={inputHandler}
               validators={[VALIDATOR_MINLENGTH(6)]}
               errorText="Password should be at least 6 characters long."
             />
+            {!isLoginMode && (
+              <Input
+                id="confirmPassword"
+                element="input"
+                label="Confirm Password"
+                type="password"
+                onInput={inputHandler}
+                validators={[VALIDATOR_MINLENGTH(6)]}
+                errorText="Password should be at least 6 characters long."
+              />
+            )}
+            {!isLoginMode && (
+              <Input
+                id="birthday"
+                element="input"
+                label="Birthday"
+                type="date"
+                onInput={inputHandler}
+                validators={[VALIDATOR_REQUIRE()]}
+                errorText="Please pick your birthday."
+              />
+            )}
+            {!isLoginMode && (
+              <Input
+                id="address"
+                element="input"
+                label="Address"
+                type="text"
+                onInput={inputHandler}
+                validators={[VALIDATOR_REQUIRE()]}
+                errorText="Please enter an address."
+              />
+            )}
+            {!isLoginMode && (
+              <Input
+                id="role"
+                element="select"
+                label="Role"
+                onInput={inputHandler}
+                validators={[VALIDATOR_REQUIRE()]}
+                errorText="Please pick a role."
+                initialValue="Dispecer"
+                initialValid={true}
+                selectOptions={[
+                  { value: "Dispecer" },
+                  { value: "Clan ekipe" },
+                  { value: "Radnik" },
+                ]}
+              />
+            )}
+            {!isLoginMode && isTeamMemberRole && (
+              <Input
+                id="team"
+                element="select"
+                label="Team"
+                onInput={inputHandler}
+                validators={[VALIDATOR_REQUIRE()]}
+                errorText="Please pick a team."
+                selectOptions={[
+                  { value: "Team1" },
+                  { value: "Team2" },
+                  { value: "Team3" },
+                ]}
+              />
+            )}
+            {!isLoginMode && (
+              <ImageUpload
+                center
+                id="image"
+                onInput={inputHandler}
+                errorText="Please provide an image."
+                className="authentication__imageUpload"
+              />
+            )}
+            <Button type="submit" disabled={!formState.isValid}>
+              {isLoginMode && "LOGIN"}
+              {!isLoginMode && "SIGNUP"}
+            </Button>
+          </form>
+          {isLoginMode && (
+            <div className="authentication__socialLogin_button">
+              <GoogleLogin
+                clientId="20750505971-rm4o3m5qtk5ra0g325v64pch5hug1qsl.apps.googleusercontent.com"
+                buttonText="Continue with Google"
+                onSuccess={responseGoogleSuccess}
+                onFailure={responseGoogleFailure}
+                cookiePolicy={"single_host_origin"}
+              />
+            </div>
           )}
-          {!isLoginMode && (
-            <Input
-              id="birthday"
-              element="input"
-              label="Birthday"
-              type="date"
-              onInput={inputHandler}
-              validators={[VALIDATOR_REQUIRE()]}
-              errorText="Please pick your birthday."
-            />
-          )}
-          {!isLoginMode && (
-            <Input
-              id="address"
-              element="input"
-              label="Address"
-              type="text"
-              onInput={inputHandler}
-              validators={[VALIDATOR_REQUIRE()]}
-              errorText="Please enter an address."
-            />
-          )}
-          {!isLoginMode && (
-            <Input
-              id="role"
-              element="select"
-              label="Role"
-              onInput={inputHandler}
-              validators={[VALIDATOR_REQUIRE()]}
-              errorText="Please pick a role."
-              initialValue="Dispecer"
-              initialValid={true}
-              selectOptions={[
-                { value: "Dispecer" },
-                { value: "Clan ekipe" },
-                { value: "Radnik" },
-              ]}
-            />
-          )}
-          {!isLoginMode && isTeamMemberRole && (
-            <Input
-              id="team"
-              element="select"
-              label="Team"
-              onInput={inputHandler}
-              validators={[VALIDATOR_REQUIRE()]}
-              errorText="Please pick a team."
-              selectOptions={[
-                { value: "Team1" },
-                { value: "Team2" },
-                { value: "Team3" },
-              ]}
-            />
-          )}
-          {!isLoginMode && (
-            <ImageUpload
-              center
-              id="image"
-              onInput={inputHandler}
-              errorText="Please provide an image."
-              className="authentication__imageUpload"
-            />
-          )}
-          <Button type="submit" disabled={!formState.isValid}>
-            {isLoginMode && "LOGIN"}
-            {!isLoginMode && "SIGNUP"}
+          <Button inverse onClick={switchModeHandler}>
+            {isLoginMode && "Don't have an account? Register here."}
+            {!isLoginMode && "Already have an account? Log in here."}
           </Button>
-        </form>
-        {isLoginMode && (
-          <div className="authentication__socialLogin_button">
-            <GoogleLogin
-              clientId="20750505971-rm4o3m5qtk5ra0g325v64pch5hug1qsl.apps.googleusercontent.com"
-              buttonText="Continue with Google"
-              onSuccess={responseGoogleSuccess}
-              onFailure={responseGoogleFailure}
-              cookiePolicy={"single_host_origin"}
-            />
-          </div>
-        )}
-        <Button inverse onClick={switchModeHandler}>
-          {isLoginMode && "Don't have an account? Register here."}
-          {!isLoginMode && "Already have an account? Log in here."}
-        </Button>
-      </Card>
+        </Card>
+      )}
     </React.Fragment>
   );
 };

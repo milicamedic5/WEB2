@@ -82,6 +82,53 @@ namespace Web2.Controllers
         }
 
         [HttpGet]
+        [Route("get/{id}")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        public async Task<IActionResult> Get(int id)
+        {
+            try
+            {
+                string userId = User.Claims.First(c => c.Type == "UserID").Value;
+                var user = (User)await unitOfWork.UserManager.FindByIdAsync(userId);
+
+                string userRole = User.Claims.First(c => c.Type == "Roles").Value;
+
+                if (user == null)
+                {
+                    return NotFound(new { message = "User not found" });
+                }
+
+                var workRequest = (await unitOfWork.WorkRequestRepository.Get(w => w.WorkRequestId == id, null, "CreatedBy")).FirstOrDefault();
+
+                if (user.Id != workRequest.CreatedBy.Id)
+                {
+                    return Unauthorized();
+                }
+
+                return Ok(new { 
+                    id = workRequest.WorkRequestId,
+                    type = workRequest.Type,
+                    status = workRequest.Status,
+                    incident = workRequest.Incident,
+                    startdate = workRequest.StartDate.ToString(),
+                    enddate = workRequest.EndDate.ToString(),
+                    phone = workRequest.Phone,
+                    createdby = workRequest.CreatedBy.Id,
+                    purpose = workRequest.Purpose,
+                    details = workRequest.Details,
+                    notes = workRequest.Notes,
+                    company = workRequest.Company,
+                    createddate = workRequest.CreatedDate,
+                    emergency = workRequest.EmergencyWork.ToString()
+                });
+            }
+            catch (Exception)
+            {
+                return StatusCode(500, "Failed to return work request");
+            }
+        }
+
+        [HttpGet]
         [Route("get-all")]
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public async Task<IActionResult> GetAll()
@@ -106,10 +153,11 @@ namespace Web2.Controllers
                     workRequestsToReturn.Add(new
                     {
                         id = item.WorkRequestId,
-                        startdate = item.StartDate.ToString("yyyy-mm-dd"),
+                        startdate = item.StartDate.ToString("d"),
                         phone = item.Phone,
                         status = item.Status,
-                        address = item.CreatedBy.Address
+                        address = item.CreatedBy.Address,
+                        createdby = item.CreatedBy.Id
                     });
                 }
                 return Ok(workRequestsToReturn);
@@ -118,6 +166,165 @@ namespace Web2.Controllers
             {
                 return StatusCode(500, "Failed to return all work requests");
             }
+        }
+
+        [HttpGet]
+        [Route("get-mine")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        public async Task<IActionResult> GetMine()
+        {
+            try
+            {
+                string userId = User.Claims.First(c => c.Type == "UserID").Value;
+                var user = (User)await unitOfWork.UserManager.FindByIdAsync(userId);
+
+                string userRole = User.Claims.First(c => c.Type == "Roles").Value;
+
+                if (user == null)
+                {
+                    return NotFound(new { message = "User not found" });
+                }
+
+                var allWorkRequests = await unitOfWork.WorkRequestRepository.Get(x => x.CreatedBy.Id == userId, null, "CreatedBy");
+                var workRequestsToReturn = new List<object>();
+
+                foreach (var item in allWorkRequests)
+                {
+                    workRequestsToReturn.Add(new
+                    {
+                        id = item.WorkRequestId,
+                        startdate = item.StartDate.ToString("d"),
+                        phone = item.Phone,
+                        status = item.Status,
+                        address = item.CreatedBy.Address,
+                        createdby = item.CreatedBy.Id
+                    });
+                }
+                return Ok(workRequestsToReturn);
+            }
+            catch (Exception)
+            {
+                return StatusCode(500, "Failed to return all work requests");
+            }
+        }
+
+        [HttpDelete]
+        [Route("delete/{id}")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        public async Task<IActionResult> Delete(int id)
+        {
+            if (String.IsNullOrEmpty(id.ToString()))
+            {
+                return BadRequest();
+            }
+            try
+            {
+                string userId = User.Claims.First(c => c.Type == "UserID").Value;
+
+                string userRole = User.Claims.First(c => c.Type == "Roles").Value;
+
+                var user = await unitOfWork.UserManager.FindByIdAsync(userId);
+
+                if (user == null)
+                {
+                    return NotFound(new { message = "User not found" });
+                }
+
+                var workRequest = await unitOfWork.WorkRequestRepository.GetByID(id);
+                user.WorkRequests.Remove(workRequest);
+
+                if (user.Id != workRequest.CreatedBy.Id)
+				{
+                    return Unauthorized();
+				}
+
+                try
+                {
+                    unitOfWork.UserRepository.Update(user);
+                    unitOfWork.WorkRequestRepository.Delete(workRequest);
+                    await unitOfWork.Commit();
+                }
+                catch (Exception)
+                {
+
+                    return StatusCode(500, "Failed to delete work request. One of transaction failed");
+
+                }
+
+                return Ok(new { message = "Success" });
+            }
+            catch (Exception)
+            {
+                return StatusCode(500, "Failed to delete work request");
+            }
+
+        }
+
+        [HttpPatch]
+        [Route("{id}")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        public async Task<IActionResult> Update(int id, WorkRequest dto)
+        {
+            if (String.IsNullOrEmpty(id.ToString()))
+            {
+                return BadRequest();
+            }
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            try
+            {
+                string userId = User.Claims.First(c => c.Type == "UserID").Value;
+
+                string userRole = User.Claims.First(c => c.Type == "Roles").Value;
+
+                var user = await unitOfWork.UserManager.FindByIdAsync(userId);
+
+                if (user == null)
+                {
+                    return NotFound(new { message = "User not found" });
+                }
+
+                var workRequest = (await unitOfWork.WorkRequestRepository.Get(w => w.WorkRequestId == id, null, "CreatedBy")).FirstOrDefault();
+
+                if (userId != workRequest.CreatedBy.Id)
+				{
+                    return Unauthorized();
+				}
+
+                workRequest.Type = dto.Type;
+                workRequest.Status = dto.Status;
+                workRequest.Incident = dto.Incident;
+                workRequest.StartDate = dto.StartDate;
+                workRequest.EndDate = dto.EndDate;
+                workRequest.Purpose = dto.Purpose;
+                workRequest.Notes = dto.Notes;
+                workRequest.Details = dto.Details;
+                workRequest.Phone = dto.Phone;
+                workRequest.EmergencyWork = dto.EmergencyWork;
+                workRequest.Company = dto.Company;
+
+                try
+                {
+                    unitOfWork.UserRepository.Update(user);
+                    unitOfWork.WorkRequestRepository.Update(workRequest);
+                    await unitOfWork.Commit();
+                }
+                catch (Exception)
+                {
+
+                    return StatusCode(500, "Failed to update work request. One of transaction failed");
+
+                }
+
+                return Ok(new { message = "Success" });
+            }
+            catch (Exception)
+            {
+                return StatusCode(500, "Failed to update work request");
+            }
+
         }
     }
 }

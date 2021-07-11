@@ -395,7 +395,7 @@ namespace Web2.Controllers
             }
             catch (Exception)
             {
-                return StatusCode(500, "Failed to delete team");
+                return StatusCode(500, "Failed to update team");
             }
 
         }
