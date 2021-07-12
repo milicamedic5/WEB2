@@ -39,7 +39,6 @@ const Teams = () => {
   };
 
   const deleteTeamHandler = (teamId) => {
-    console.log(teamId);
     setTeams((prevState) => prevState.filter((team) => team.id !== teamId));
   };
 

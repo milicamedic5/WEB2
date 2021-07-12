@@ -96,7 +96,6 @@ const Auth = () => {
 
   useEffect(() => {
     if (formState.inputs.role) {
-      console.log(formState.inputs.role);
       setIsTeamMemberRole((prevState) => {
         return formState.inputs.role.value === "Clan ekipe" ? true : false;
       });
@@ -118,11 +117,8 @@ const Auth = () => {
             "Content-Type": "application/json",
           }
         );
-        console.log(responseData);
         auth.login(responseData.userId, responseData.token, responseData.role);
-      } catch (error) {
-        console.log(error);
-      }
+      } catch (error) {}
     } else {
       const formData = new FormData();
       formData.append("Email", formState.inputs.email.value);
@@ -145,17 +141,26 @@ const Auth = () => {
         );
       } catch (err) {}
     }
-    console.log(formState.inputs);
-    console.log("approved or not?");
   };
 
-  const responseGoogleSuccess = (response) => {
-    console.log(response);
+  const responseGoogleSuccess = async (response) => {
+    try {
+      const responseData = await sendRequest(
+        "http://localhost:5000/api/auth/social",
+        "POST",
+        JSON.stringify({
+          Email: response.profileObj.email,
+          IdToken: response.tokenId,
+        }),
+        {
+          "Content-Type": "application/json",
+        }
+      );
+      auth.login(responseData.userId, responseData.token, responseData.role);
+    } catch (error) {}
   };
 
-  const responseGoogleFailure = (response) => {
-    console.log(response);
-  };
+  const responseGoogleFailure = (response) => {};
 
   return (
     <React.Fragment>

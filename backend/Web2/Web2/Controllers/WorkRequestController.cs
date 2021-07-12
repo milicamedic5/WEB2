@@ -98,12 +98,22 @@ namespace Web2.Controllers
                     return NotFound(new { message = "User not found" });
                 }
 
-                var workRequest = (await unitOfWork.WorkRequestRepository.Get(w => w.WorkRequestId == id, null, "CreatedBy")).FirstOrDefault();
+                var workRequest = (await unitOfWork.WorkRequestRepository.Get(w => w.WorkRequestId == id, null, "CreatedBy,StateChanges")).FirstOrDefault();
 
                 if (user.Id != workRequest.CreatedBy.Id)
                 {
                     return Unauthorized();
                 }
+
+                var stateChanges = new List<object>();
+				foreach (var item in workRequest.StateChanges)
+				{
+                    stateChanges.Add(new { 
+                        id = item.StateChangeId,
+                        changedate = item.ChangeDate,
+                        state = item.State
+                    });
+				}
 
                 return Ok(new { 
                     id = workRequest.WorkRequestId,
@@ -119,7 +129,8 @@ namespace Web2.Controllers
                     notes = workRequest.Notes,
                     company = workRequest.Company,
                     createddate = workRequest.CreatedDate,
-                    emergency = workRequest.EmergencyWork.ToString()
+                    emergency = workRequest.EmergencyWork.ToString(),
+                    statechanges = stateChanges
                 });
             }
             catch (Exception)
@@ -238,10 +249,16 @@ namespace Web2.Controllers
                     return Unauthorized();
 				}
 
+                var stateChanges = await unitOfWork.StateChangeRepository.Get(x => x.WorkRequest.WorkRequestId == id);
+
                 try
                 {
                     unitOfWork.UserRepository.Update(user);
                     unitOfWork.WorkRequestRepository.Delete(workRequest);
+					foreach (var item in stateChanges)
+					{
+                        unitOfWork.StateChangeRepository.Delete(item);
+					}
                     await unitOfWork.Commit();
                 }
                 catch (Exception)

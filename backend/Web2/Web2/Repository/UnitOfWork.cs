@@ -19,6 +19,7 @@ namespace Web2.Repository
 		private IUserRepository userRepository;
 		private ITeamRepository teamRepository;
 		private IWorkRequestRepository workRequestRepository;
+		private IStateChangeRepository stateChangeRepository;
 
 		public UnitOfWork(DataContext _context, RoleManager<IdentityRole> _roleManager,
 			UserManager<User> _userManager, SignInManager<User> _signInManager)
@@ -62,6 +63,15 @@ namespace Web2.Repository
 			{
 				return workRequestRepository = workRequestRepository ??
 					new WorkRequestRepository(this.context);
+			}
+		}
+
+		public IStateChangeRepository StateChangeRepository
+		{
+			get
+			{
+				return stateChangeRepository = stateChangeRepository ??
+					new StateChangeRepository(this.context);
 			}
 		}
 

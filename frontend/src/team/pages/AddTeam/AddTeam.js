@@ -45,9 +45,7 @@ const AddTeam = () => {
             return { ...user, minusDisabled: true, plusDisabled: false };
           })
         );
-      } catch (err) {
-        console.log(err);
-      }
+      } catch (err) {}
     };
     fetchTeamMembers();
   }, [sendRequest, auth.token]);
@@ -95,7 +93,6 @@ const AddTeam = () => {
       );
       history.push("/teams");
     } catch (error) {}
-    console.log(members);
   };
 
   return (

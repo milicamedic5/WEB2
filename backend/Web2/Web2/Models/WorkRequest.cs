@@ -20,6 +20,12 @@ namespace Web2.Models
 		public bool EmergencyWork { get; set; }
 		public string Company { get; set; }
 		public string Phone { get; set; }
+		public ICollection<StateChange> StateChanges { get; set; }
 		public DateTime CreatedDate { get; set; }
+
+		public WorkRequest()
+		{
+			StateChanges = new HashSet<StateChange>();
+		}
 	}
 }

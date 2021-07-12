@@ -15,10 +15,12 @@ namespace Web2.Data
 		{
 			modelBuilder.Entity<Team>().HasMany(t => t.Members).WithOne(u => u.Team);
 			modelBuilder.Entity<User>().HasMany(u => u.WorkRequests).WithOne(w => w.CreatedBy);
+			modelBuilder.Entity<WorkRequest>().HasMany(w => w.StateChanges).WithOne(s => s.WorkRequest);
 			base.OnModelCreating(modelBuilder);
 		}
 		public DbSet<User> Users { get; set; }
 		public DbSet<Team> Teams { get; set; }
 		public DbSet<WorkRequest> WorkRequests { get; set; }
+		public DbSet<StateChange> StateChanges { get; set; }
 	}
 }

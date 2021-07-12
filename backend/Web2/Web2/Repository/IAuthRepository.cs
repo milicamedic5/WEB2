@@ -18,5 +18,6 @@ namespace Web2.Repository
 		Task<User> GetUserById(string id);
 		Task<User> GetUserByUserName(string username);
 		Task<User> GetUserByEmail(string email);
+		bool VerifyToken(string providerToken);
 	}
 }

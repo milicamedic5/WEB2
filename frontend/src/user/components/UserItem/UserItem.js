@@ -28,9 +28,7 @@ const UserItem = (props) => {
         }
       );
       props.onDeny(props.id);
-    } catch (error) {
-      console.log(error);
-    }
+    } catch (error) {}
   };
 
   const userApprovedHandler = async () => {
@@ -49,9 +47,7 @@ const UserItem = (props) => {
         }
       );
       props.onApprove(props.id);
-    } catch (error) {
-      console.log(error);
-    }
+    } catch (error) {}
   };
 
   return (

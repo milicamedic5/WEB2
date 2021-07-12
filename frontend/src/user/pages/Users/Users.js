@@ -22,27 +22,21 @@ const Users = () => {
           }
         );
         setLoadedUsers(responseData);
-      } catch (err) {
-        console.log(err);
-      }
+      } catch (err) {}
     };
     fetchAll();
   }, [sendRequest, auth.token]);
 
   const userDeniedHandler = (userId) => {
-    console.log(userId);
     const usersIndex = loadedUsers.findIndex((user) => user.id === userId);
     let newArray = [...loadedUsers];
-    console.log(newArray, userId);
     newArray[usersIndex].status = "Denied";
     setLoadedUsers((prevUsers) => (prevUsers = newArray));
   };
 
   const userApprovedHandler = (userId) => {
-    console.log(userId);
     const usersIndex = loadedUsers.findIndex((user) => user.id === userId);
     let newArray = [...loadedUsers];
-    console.log(newArray, userId);
     newArray[usersIndex].status = "Approved";
     setLoadedUsers((prevUsers) => (prevUsers = newArray));
   };

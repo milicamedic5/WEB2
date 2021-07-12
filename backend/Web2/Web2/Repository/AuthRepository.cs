@@ -1,7 +1,10 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
+using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web;
 using Web2.Models;
@@ -77,6 +80,35 @@ namespace Web2.Repository
         public async Task<IdentityResult> RegisterUser(User user, string password)
         {
             return await userManager.CreateAsync(user, password);
+        }
+
+        private const string GoogleApiTokenInfoUrl = "https://www.googleapis.com/oauth2/v3/tokeninfo?id_token={0}";
+
+        public bool VerifyToken(string providerToken)
+        {
+            var httpClient = new HttpClient();
+            var requestUri = new Uri(string.Format(GoogleApiTokenInfoUrl, providerToken));
+
+            HttpResponseMessage httpResponseMessage;
+
+            try
+            {
+                httpResponseMessage = httpClient.GetAsync(requestUri).Result;
+            }
+            catch (Exception ex)
+            {
+                return false;
+            }
+
+            if (httpResponseMessage.StatusCode != HttpStatusCode.OK)
+            {
+                return false;
+            }
+
+            var response = httpResponseMessage.Content.ReadAsStringAsync().Result;
+            var googleApiTokenInfo = JsonConvert.DeserializeObject<GoogleApiTokenInfo>(response);
+
+            return true;
         }
     }
 }

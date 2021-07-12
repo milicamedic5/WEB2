@@ -1,0 +1,13 @@
+.history_of_state_changes {
+  width: 70%;
+  margin: 0 auto;
+}
+
+.history_of_state_changes__actions {
+  width: auto;
+  height: 5rem;
+  margin: 0 auto;
+  margin-bottom: 2rem;
+}
+.history_of_state_changes__table {
+}

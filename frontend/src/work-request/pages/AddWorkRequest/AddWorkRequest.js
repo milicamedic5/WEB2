@@ -11,6 +11,7 @@ import { useHttpClient } from "../../../shared/hooks/http-hook";
 // import { VALIDATOR_REQUIRE } from "../../../shared/util/validators";
 // import { useForm } from "../../../shared/hooks/form-hook";
 import BasicInformation from "../../components/BasicInformation/BasicInformation";
+import HistoryOfStateChanges from "../../components/HistoryOfStateChanges/HistoryOfStateChanges";
 
 import "./AddWorkRequest.css";
 
@@ -54,9 +55,7 @@ const AddWorkRequest = () => {
           setWorkRequest(responseDataWorkRequest);
         }
         setLoggedUser(responseData);
-      } catch (err) {
-        console.log(err);
-      }
+      } catch (err) {}
     };
     fetchUser();
   }, [sendRequest]);
@@ -169,6 +168,11 @@ const AddWorkRequest = () => {
           workRequest={workRequest}
         />
       )}
+      {!isLoading &&
+        loggedUser &&
+        activeButton === HISTORY_OF_STATE_CHANGES && (
+          <HistoryOfStateChanges workRequest={workRequest} />
+        )}
       {/* {activeButton === BASIC_INFO && <BasicInformation userId={userId} />}
     {activeButton === BASIC_INFO && <BasicInformation userId={userId} />}
     {activeButton === BASIC_INFO && <BasicInformation userId={userId} />} */}

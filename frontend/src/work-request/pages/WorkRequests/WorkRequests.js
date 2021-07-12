@@ -9,8 +9,12 @@ import Button from "../../../shared/components/FormElements/Button/Button";
 import ErrorModal from "../../../shared/components/UIElements/ErrorModal/ErrorModal";
 import LoadingSpinner from "../../../shared/components/UIElements/LoadingSpinner/LoadingSpinner";
 import WorkRequestsList from "../../components/WorkRequestsList/WorkRequestsList";
+import { useStateWithCallbackLazy } from "use-state-with-callback";
 
 import "./WorkRequests.css";
+
+const ID_SORT = "ID";
+const START_DATE_SORT = "STARTDATE";
 
 const WorkRequests = () => {
   const userId = useParams().userId;
@@ -20,6 +24,8 @@ const WorkRequests = () => {
   const { isLoading, error, sendRequest, clearError } = useHttpClient();
   const auth = useContext(AuthContext);
   const history = useHistory();
+  const [sortIDAsc, setSortIDAsc] = useState(false);
+  const [sortStartDateAsc, setSortStartDateAsc] = useState(false);
 
   useEffect(() => {
     const fetchAll = async () => {
@@ -42,8 +48,6 @@ const WorkRequests = () => {
         );
         setWorkRequests(responseData);
         setMineWorkRequests(responseDataMine);
-        console.log(responseData);
-        console.log(responseDataMine);
       } catch (err) {}
     };
     fetchAll();
@@ -64,6 +68,73 @@ const WorkRequests = () => {
 
   const workRequestListHandler = () => {
     setShowAllWorkRequests((prevState) => !prevState);
+  };
+
+  const sortUpdateArray = (type) => {
+    switch (type) {
+      case ID_SORT:
+        if (sortIDAsc === true) {
+          if (showAllWorkRequests) {
+            const newArray = [...workRequests].sort((a, b) => a.id - b.id);
+            setWorkRequests(newArray);
+          } else {
+            const newArray = [...mineWorkRequests].sort((a, b) => a.id - b.id);
+            setMineWorkRequests(newArray);
+          }
+        } else {
+          if (showAllWorkRequests) {
+            const newArray = [...workRequests].sort((a, b) => b.id - a.id);
+            setWorkRequests(newArray);
+          } else {
+            const newArray = [...mineWorkRequests].sort((a, b) => b.id - a.id);
+            setMineWorkRequests(newArray);
+          }
+        }
+        break;
+      case START_DATE_SORT:
+        if (sortStartDateAsc === true) {
+          if (showAllWorkRequests) {
+            const newArray = [...workRequests].sort((a, b) =>
+              a.startdate > b.startdate ? 1 : b.startdate > a.startdate ? -1 : 0
+            );
+            setWorkRequests(newArray);
+          } else {
+            const newArray = [...mineWorkRequests].sort((a, b) =>
+              a.startdate > b.startdate ? 1 : b.startdate > a.startdate ? -1 : 0
+            );
+            setMineWorkRequests(newArray);
+          }
+        } else {
+          if (showAllWorkRequests) {
+            const newArray = [...workRequests].sort((a, b) =>
+              b.startdate > a.startdate ? 1 : a.startdate > b.startdate ? -1 : 0
+            );
+            setWorkRequests(newArray);
+          } else {
+            const newArray = [...mineWorkRequests].sort((a, b) =>
+              b.startdate > a.startdate ? 1 : a.startdate > b.startdate ? -1 : 0
+            );
+            setMineWorkRequests(newArray);
+          }
+        }
+        break;
+      default:
+        break;
+    }
+  };
+
+  const sortUpdateArrayHandler = (type) => {
+    switch (type) {
+      case ID_SORT:
+        setSortIDAsc(!sortIDAsc);
+        break;
+      case START_DATE_SORT:
+        setSortStartDateAsc(!sortStartDateAsc);
+        break;
+      default:
+        break;
+    }
+    sortUpdateArray(type);
   };
 
   return (
@@ -92,12 +163,18 @@ const WorkRequests = () => {
           <WorkRequestsList
             items={workRequests}
             onDelete={deleteWorkRequestHandler}
+            sortIDAsc={sortIDAsc}
+            sortStartDateAsc={sortStartDateAsc}
+            sortUpdateArray={sortUpdateArrayHandler}
           />
         )}
         {!showAllWorkRequests && mineWorkRequests && (
           <WorkRequestsList
             items={mineWorkRequests}
             onDelete={deleteWorkRequestHandler}
+            sortIDAsc={sortIDAsc}
+            sortStartDateAsc={sortStartDateAsc}
+            sortUpdateArray={sortUpdateArrayHandler}
           />
         )}
       </Card>

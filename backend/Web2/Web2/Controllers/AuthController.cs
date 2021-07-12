@@ -175,5 +175,58 @@ namespace Web2
 				return StatusCode(500, "Login failed.");
 			}
 		}
+
+		[AllowAnonymous]
+		[HttpPost]
+		[Route("social")]
+		public async Task<IActionResult> SocialLogin([FromBody] SocialNetworkDto dto)
+		{
+			if (unitOfWork.AuthRepository.VerifyToken(dto.IdToken))
+			{
+
+				try
+				{
+					var user = await this.unitOfWork.AuthRepository.GetUserByEmail(dto.Email);
+					string role = "RegularUser";
+
+					if (user == null)
+					{
+						return StatusCode(500, "Login failed. Try sign up first");
+					}
+					else
+					{
+						role = (await unitOfWork.AuthRepository.GetRoles(user)).FirstOrDefault();
+					}
+
+
+					var tokenDescriptor = new SecurityTokenDescriptor
+					{
+						Subject = new ClaimsIdentity(new Claim[]
+				   {
+						new Claim("UserID",user.Id.ToString()),
+						new Claim("Roles", role),
+				   }),
+						Expires = DateTime.UtcNow.AddMinutes(5),
+						//Key min: 16 characters
+						SigningCredentials = new SigningCredentials(
+					   new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration.GetSection("AppSettings:Token").Value)),
+					   SecurityAlgorithms.HmacSha256Signature)
+					};
+					var tokenHandler = new JwtSecurityTokenHandler();
+					var securityToken = tokenHandler.CreateToken(tokenDescriptor);
+					var token = tokenHandler.WriteToken(securityToken);
+
+					var userId = user.Id.ToString();
+					return Ok(new { userId, token, role });
+				}
+				catch (Exception)
+				{
+					return StatusCode(500, "Login failed.");
+				}
+
+			}
+
+			return BadRequest();
+		}
 	}
 }

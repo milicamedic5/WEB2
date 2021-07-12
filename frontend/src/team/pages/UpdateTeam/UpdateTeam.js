@@ -48,8 +48,6 @@ const UpdateTeam = (props) => {
             Authorization: "Bearer " + auth.token,
           }
         );
-        console.log(responseData.members);
-        console.log(responseDataOther);
         const merged = [
           ...responseData.members.map((member) => {
             return { ...member, minusDisabled: false, plusDisabled: true };
@@ -77,12 +75,9 @@ const UpdateTeam = (props) => {
           },
           true
         );
-      } catch (err) {
-        console.log(err);
-      }
+      } catch (err) {}
     };
     fetchTeam();
-    console.log(formState);
   }, [sendRequest, auth.token, formState, setFormData, teamId]);
   //wafafwafwafwaaaaa
   //wafafwafwafwaaaaa

@@ -13,7 +13,6 @@ import { useHistory } from "react-router";
 import "./BasicInformation.css";
 
 const BasicInformation = (props) => {
-  console.log(props.workRequest);
   const [isTeamMemberRole, setIsTeamMemberRole] = useState(false);
   const { isLoading, error, sendRequest, clearError } = useHttpClient();
   const auth = useContext(AuthContext);
@@ -89,7 +88,6 @@ const BasicInformation = (props) => {
 
   const formSubmitHandler = async (event) => {
     event.preventDefault();
-    console.log(formState.inputs);
     if (props.workRequest) {
       try {
         await sendRequest(
@@ -140,6 +138,7 @@ const BasicInformation = (props) => {
             Authorization: "Bearer " + auth.token,
           }
         );
+        history.push(`/${auth.userId}/workrequests`);
       } catch (err) {}
     }
   };

@@ -8,7 +8,6 @@ const TeamsList = (props) => {
     return <h2 className="teams-list__content">No teams added yet.</h2>;
   }
 
-  console.log(props.items);
   return (
     <ul className="teams-list">
       {props.items.map((item) => (
